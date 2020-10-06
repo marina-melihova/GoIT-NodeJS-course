@@ -1,0 +1,28 @@
+{
+  "name": "GoIT-NodeJS-course",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marina-melihova/GoIT-NodeJS-course.git"
+  },
+  "keywords": [],
+  "author": "marina-melihova",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marina-melihova/GoIT-NodeJS-course/issues"
+  },
+  "homepage": "https://github.com/marina-melihova/GoIT-NodeJS-course#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "shortid": "^2.2.15",
+    "yargs": "^16.0.3"
+  }
+}

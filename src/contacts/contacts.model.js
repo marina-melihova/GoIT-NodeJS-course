@@ -7,63 +7,77 @@ const contactsPath = path.join(__dirname, '../db/contacts.json');
 
 const listContacts = async () => {
   try {
-    // throw new Error('testing check');
     const contacts = await fsPromise.readFile(contactsPath, 'utf-8');
     return JSON.parse(contacts);
   } catch (error) {
-    throw 'could not read file: ' + error;
+    console.error(error);
+    process.exit(1);
   }
 };
 
 const findContactById = async contactId => {
-  const contacts = await listContacts();
-  return contacts.find(({ id }) => id === contactId);
+  try {
+    const contacts = await listContacts();
+    return contacts.find(({ id }) => id === contactId);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 };
 
 const removeContact = async contactId => {
-  const contacts = await listContacts();
-  const newList = contacts.filter(({ id }) => id !== contactId);
   try {
-    // throw new Error("testing check");
+    const contacts = await listContacts();
+
+    const newList = contacts.filter(({ id }) => id !== contactId);
+
     await fsPromise.writeFile(contactsPath, JSON.stringify(newList));
   } catch (error) {
-    throw 'could not write file: ' + error;
+    console.error(error);
+    process.exit(1);
   }
 };
 
 const saveContact = async contact => {
-  const { name, email, phone } = contact;
-  const contacts = await listContacts();
-  const id = shortid.generate();
-  const createdContact = { id, name, email, phone };
-  const newList = [...contacts, createdContact];
   try {
-    // throw new Error("testing check");
+    const { name, email, phone } = contact;
+
+    const contacts = await listContacts();
+
+    const id = shortid.generate();
+    const createdContact = { id, name, email, phone };
+    const newList = [...contacts, createdContact];
+
     await fsPromise.writeFile(contactsPath, JSON.stringify(newList));
+
     return createdContact;
   } catch (error) {
-    throw 'could not write file: ' + error;
+    console.error(error);
+    process.exit(1);
   }
 };
 
-const changeContact = async (id, contactParams) => {
-  const contacts = await listContacts();
-  const contactIndex = contacts.findIndex(contact => contact.id === id);
-
-  if (contactIndex === -1) {
-    return;
-  }
-
-  contacts[contactIndex] = {
-    ...contacts[contactIndex],
-    ...contactParams,
-  };
+const changeContact = async (contactId, contactParams) => {
   try {
-    // throw new Error('testing check');
+    const contacts = await listContacts();
+
+    const contactIndex = contacts.findIndex(({ id }) => id === contactId);
+
+    if (contactIndex === -1) {
+      return;
+    }
+
+    contacts[contactIndex] = {
+      ...contacts[contactIndex],
+      ...contactParams,
+    };
+
     await fsPromise.writeFile(contactsPath, JSON.stringify(contacts));
+
     return contacts[contactIndex];
   } catch (error) {
-    throw 'could not write file: ' + error;
+    console.error(error);
+    process.exit(1);
   }
 };
 

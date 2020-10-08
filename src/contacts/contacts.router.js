@@ -11,10 +11,6 @@ const {
 
 const router = Router();
 
-// CRUD
-
-// 1. C - create
-// POST /users
 const createContactSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
@@ -22,14 +18,10 @@ const createContactSchema = Joi.object({
 });
 router.post('/', validate(createContactSchema), addContact);
 
-// 2. R - read
-// GET /users
 router.get('/', getContacts);
-// GET /users/:id
+
 router.get('/:contactId', getContactById);
 
-// 3. U - update
-// PUT /users/:id
 const updateContactSchema = Joi.object({
   name: Joi.string(),
   email: Joi.string().email(),
@@ -37,8 +29,6 @@ const updateContactSchema = Joi.object({
 });
 router.patch('/:contactId', validate(updateContactSchema), updateContact);
 
-// 4. D - delete
-// DELETE /users/:id
 router.delete('/:contactId', deleteContact);
 
 exports.contactsRouter = router;

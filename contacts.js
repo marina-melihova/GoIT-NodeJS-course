@@ -5,57 +5,48 @@ const { promises: fsPromise } = fs;
 
 const contactsPath = path.join(__dirname, "./db/contacts.json");
 
-async function getContacts() {
+async function listContacts() {
   try {
-    // throw new Error("Error: could not read file");
     const contacts = await fsPromise.readFile(contactsPath, "utf-8");
     return JSON.parse(contacts);
   } catch (error) {
     console.error(error.message);
-    return false;
+    process.exit(1);
   }
-}
-
-async function listContacts() {
-  const contacts = await getContacts();
-  contacts && console.table(contacts);
 }
 
 async function getContactById(contactId) {
-  const contacts = await getContacts();
-  contacts && console.table(contacts.find(({ id }) => id === contactId));
+  try {
+    const contacts = await listContacts();
+    return contacts.find(({ id }) => id === contactId);
+  } catch (error) {
+    console.error(error.message);
+    process.exit(1);
+  }
 }
 
 async function removeContact(contactId) {
-  const contacts = await getContacts();
-  if (!contacts) {
-    return;
-  }
-  const newList = contacts.filter(({ id }) => id !== contactId);
   try {
-    // throw new Error("Error: could not write file");
+    const contacts = await listContacts();
+    const newList = contacts.filter(({ id }) => id !== contactId);
     await fsPromise.writeFile(contactsPath, JSON.stringify(newList));
-    console.log(`Contact with ID = ${contactId} has been successfully removed`);
   } catch (error) {
     console.error(error.message);
+    process.exit(1);
   }
 }
 
 async function addContact(name, email, phone) {
-  const contacts = await getContacts();
-  if (!contacts) {
-    return;
-  }
-  const id = shortid.generate();
-  const newContact = { id, name, email, phone };
-  const newList = [...contacts, newContact];
   try {
-    // throw new Error("Error: could not write file");
+    const contacts = await listContacts();
+    const id = shortid.generate();
+    const newContact = { id, name, email, phone };
+    const newList = [...contacts, newContact];
     await fsPromise.writeFile(contactsPath, JSON.stringify(newList));
-    console.log(`A new contact has been successfully added:`);
-    console.table(newContact);
+    return newContact;
   } catch (error) {
     console.error(error.message);
+    process.exit(1);
   }
 }
 

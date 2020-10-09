@@ -1,0 +1,6 @@
+::1 - - [09/Oct/2020:14:58:33 +0000] "GET /api/contacts HTTP/1.1" 200 910 "-" "PostmanRuntime/7.26.5"
+::1 - - [09/Oct/2020:14:58:42 +0000] "GET /api/contacts/5 HTTP/1.1" 200 89 "-" "PostmanRuntime/7.26.5"
+::1 - - [09/Oct/2020:14:59:32 +0000] "DELETE /api/contacts/3 HTTP/1.1" 200 29 "-" "PostmanRuntime/7.26.5"
+::1 - - [09/Oct/2020:15:00:18 +0000] "POST /api/contacts HTTP/1.1" 201 82 "-" "PostmanRuntime/7.26.5"
+::1 - - [09/Oct/2020:15:00:27 +0000] "GET /api/contacts HTTP/1.1" 200 897 "-" "PostmanRuntime/7.26.5"
+::1 - - [09/Oct/2020:15:00:51 +0000] "GET /api/contacts HTTP/1.1" 500 116 "-" "PostmanRuntime/7.26.5"

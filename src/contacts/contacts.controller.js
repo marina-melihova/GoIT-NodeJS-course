@@ -29,11 +29,8 @@ const getContacts = async (req, res) => {
 const getContactById = async (req, res) => {
   try {
     const { contactId } = req.params;
-    const id = Number.isNaN(Number(contactId))
-      ? contactId
-      : parseInt(contactId);
 
-    const contact = await findContactById(id);
+    const contact = await findContactById(contactId);
 
     if (!contact) {
       return res.status(404).send({ message: 'Not found' });
@@ -49,11 +46,8 @@ const getContactById = async (req, res) => {
 const updateContact = async (req, res) => {
   try {
     const { contactId } = req.params;
-    const id = Number.isNaN(Number(contactId))
-      ? contactId
-      : parseInt(contactId);
 
-    const contact = await findContactById(id);
+    const contact = await findContactById(contactId);
     if (!contact) {
       return res.status(404).send({ message: 'Not found' });
     }
@@ -62,7 +56,7 @@ const updateContact = async (req, res) => {
       return res.status(400).send({ message: 'missing fields' });
     }
 
-    const updatedContact = await changeContact(id, req.body);
+    const updatedContact = await changeContact(contactId, req.body);
 
     return res.status(200).send(updatedContact);
   } catch (error) {
@@ -74,17 +68,14 @@ const updateContact = async (req, res) => {
 const deleteContact = async (req, res) => {
   try {
     const { contactId } = req.params;
-    const id = Number.isNaN(Number(contactId))
-      ? contactId
-      : parseInt(contactId);
 
-    const contact = await findContactById(id);
+    const contact = await findContactById(contactId);
 
     if (!contact) {
       return res.status(404).send({ message: 'Not found' });
     }
 
-    await removeContact(id);
+    await removeContact(contactId);
 
     return res.status(200).send({ message: 'contact deleted' });
   } catch (error) {

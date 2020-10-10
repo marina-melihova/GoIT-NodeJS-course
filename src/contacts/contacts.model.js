@@ -15,9 +15,11 @@ const listContacts = async () => {
   }
 };
 
-const findContactById = async contactId => {
+const findContactById = async id => {
   try {
     const contacts = await listContacts();
+
+    const contactId = Number.isNaN(Number(id)) ? id : parseInt(id);
     return contacts.find(({ id }) => id === contactId);
   } catch (error) {
     console.error(error);
@@ -25,10 +27,11 @@ const findContactById = async contactId => {
   }
 };
 
-const removeContact = async contactId => {
+const removeContact = async id => {
   try {
     const contacts = await listContacts();
 
+    const contactId = Number.isNaN(Number(id)) ? id : parseInt(id);
     const newList = contacts.filter(({ id }) => id !== contactId);
 
     await fsPromise.writeFile(contactsPath, JSON.stringify(newList));
@@ -57,10 +60,11 @@ const saveContact = async contact => {
   }
 };
 
-const changeContact = async (contactId, contactParams) => {
+const changeContact = async (id, contactParams) => {
   try {
     const contacts = await listContacts();
 
+    const contactId = Number.isNaN(Number(id)) ? id : parseInt(id);
     const contactIndex = contacts.findIndex(({ id }) => id === contactId);
 
     if (contactIndex === -1) {

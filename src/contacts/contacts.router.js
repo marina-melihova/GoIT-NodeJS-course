@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const asyncHandler = require('express-async-handler');
 const Joi = require('joi');
 const { validate } = require('../helpers/validate');
 const {
@@ -16,19 +17,23 @@ const createContactSchema = Joi.object({
   email: Joi.string().email().required(),
   phone: Joi.string().required(),
 });
-router.post('/', validate(createContactSchema), addContact);
+router.post('/', validate(createContactSchema), asyncHandler(addContact));
 
-router.get('/', getContacts);
+router.get('/', asyncHandler(getContacts));
 
-router.get('/:contactId', getContactById);
+router.get('/:contactId', asyncHandler(getContactById));
 
 const updateContactSchema = Joi.object({
   name: Joi.string(),
   email: Joi.string().email(),
   phone: Joi.string(),
 });
-router.patch('/:contactId', validate(updateContactSchema), updateContact);
+router.patch(
+  '/:contactId',
+  validate(updateContactSchema),
+  asyncHandler(updateContact),
+);
 
-router.delete('/:contactId', deleteContact);
+router.delete('/:contactId', asyncHandler(deleteContact));
 
 exports.contactsRouter = router;

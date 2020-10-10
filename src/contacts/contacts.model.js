@@ -10,7 +10,7 @@ const listContacts = async () => {
     const contacts = await fsPromise.readFile(contactsPath, 'utf-8');
     return JSON.parse(contacts);
   } catch (error) {
-    console.error(error);
+    console.log(error.message);
     throw error;
   }
 };
@@ -22,7 +22,7 @@ const findContactById = async id => {
     const contactId = Number.isNaN(Number(id)) ? id : parseInt(id);
     return contacts.find(({ id }) => id === contactId);
   } catch (error) {
-    console.error(error);
+    console.log(error.message);
     throw error;
   }
 };
@@ -36,7 +36,7 @@ const removeContact = async id => {
 
     await fsPromise.writeFile(contactsPath, JSON.stringify(newList));
   } catch (error) {
-    console.error(error);
+    console.log(error.message);
     throw error;
   }
 };
@@ -55,7 +55,7 @@ const saveContact = async contact => {
 
     return createdContact;
   } catch (error) {
-    console.error(error);
+    console.log(error.message);
     throw error;
   }
 };
@@ -80,7 +80,7 @@ const changeContact = async (id, contactParams) => {
 
     return contacts[contactIndex];
   } catch (error) {
-    console.error(error);
+    console.log(error.message);
     throw error;
   }
 };

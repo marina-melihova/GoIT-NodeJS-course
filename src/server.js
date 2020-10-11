@@ -36,12 +36,24 @@ class CrudServer {
 
   initRouters() {
     this.app.use('/api/contacts', contactsRouter);
+    this.app.use('*', (req, res) =>
+      res.status(404).json({ message: 'Not found' }),
+    );
   }
 
   initErrorHandling() {
     this.app.use((err, req, res, next) => {
+      if (err.name === 'ValidationError') {
+        err.status = 400;
+        err.message = `Validation error: ${err.details
+          .map(item => item.message)
+          .join(', ')}`;
+      }
+
       const statusCode = err.status || 500;
-      return res.status(statusCode).send(err.message);
+      res.status(statusCode);
+
+      res.json({ message: err.message });
     });
   }
 

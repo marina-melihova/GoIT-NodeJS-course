@@ -41,7 +41,7 @@ const removeContact = async id => {
   }
 };
 
-const saveContact = async contact => {
+const addContact = async contact => {
   try {
     const { name, email, phone } = contact;
 
@@ -89,6 +89,6 @@ module.exports = {
   listContacts,
   findContactById,
   removeContact,
-  saveContact,
+  addContact,
   changeContact,
 };

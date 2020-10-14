@@ -7,16 +7,15 @@ const {
   changeContact,
 } = require('./contacts.model');
 
-const validateRequest = async (req, next, schema) => {
+const validateRequest = async (body, schema) => {
   const options = {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: true,
   };
 
-  const value = await schema.validateAsync(req.body, options);
-  req.body = value;
-  next();
+  const value = await schema.validateAsync(body, options);
+  return value;
 };
 
 const validateCreateContact = async (req, res, next) => {
@@ -26,7 +25,9 @@ const validateCreateContact = async (req, res, next) => {
     phone: Joi.string().required(),
   });
 
-  await validateRequest(req, next, schemaCreateContact);
+  const value = await validateRequest(req.body, schemaCreateContact);
+  req.body = value;
+  next();
 };
 
 const createContact = async (req, res) => {
@@ -60,7 +61,9 @@ const validateUpdateContact = async (req, res, next) => {
     phone: Joi.string().empty(''),
   });
 
-  await validateRequest(req, next, schemaUpdateContact);
+  const value = await validateRequest(req.body, schemaUpdateContact);
+  req.body = value;
+  next();
 };
 
 const updateContact = async (req, res) => {

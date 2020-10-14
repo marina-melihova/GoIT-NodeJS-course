@@ -37,7 +37,10 @@ class CrudServer {
   initRouters() {
     this.app.use('/api/contacts', contactsRouter);
     this.app.use('*', (req, res) =>
-      res.status(404).json({ message: 'Not found' }),
+      res.status(404).json({
+        message: 'Not found',
+        description: 'The resource you tried to access does not exist.',
+      }),
     );
   }
 

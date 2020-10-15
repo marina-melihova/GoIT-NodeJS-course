@@ -38,7 +38,7 @@ const createContact = async (req, res) => {
 
 const getContacts = async (req, res) => {
   const contacts = await listContacts();
-  res.status(200).json(contacts);
+  res.json(contacts);
 };
 
 const getContactById = async (req, res) => {
@@ -50,7 +50,6 @@ const getContactById = async (req, res) => {
     return res.status(404).json({ message: 'Not found' });
   }
 
-  res.status(200);
   res.json(contact);
 };
 
@@ -80,7 +79,6 @@ const updateContact = async (req, res) => {
 
   const updatedContact = await changeContact(contactId, req.body);
 
-  res.status(200);
   res.json(updatedContact);
 };
 
@@ -95,7 +93,6 @@ const deleteContact = async (req, res) => {
 
   await removeContact(contactId);
 
-  res.status(200);
   res.json({ message: 'contact deleted' });
 };
 

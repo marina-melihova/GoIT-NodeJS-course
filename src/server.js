@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
@@ -16,8 +17,9 @@ class CrudServer {
     this.app = null;
   }
 
-  start() {
+  async start() {
     this.initServer();
+    await this.initDatabase();
     this.initMiddlewares();
     this.initRouters();
     this.initErrorHandling();
@@ -26,6 +28,20 @@ class CrudServer {
 
   initServer() {
     this.app = express();
+  }
+
+  async initDatabase() {
+    try {
+      mongoose.set('useCreateIndex', true);
+      await mongoose.connect(process.env.MONGODB_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+      });
+    } catch (err) {
+      console.log(err);
+      process.exit(1);
+    }
   }
 
   initMiddlewares() {
@@ -48,14 +64,14 @@ class CrudServer {
     this.app.use((err, req, res, next) => {
       if (err.name === 'ValidationError') {
         err.status = 400;
-        err.message = `Validation error: ${err.details
-          .map(item => item.message)
-          .join(', ')}`;
+        if (err.details) {
+          err.message = `Validation error: ${err.details
+            .map(item => item.message)
+            .join(', ')}`;
+        }
       }
-
       const statusCode = err.status || 500;
       res.status(statusCode);
-
       res.json({ message: err.message });
     });
   }

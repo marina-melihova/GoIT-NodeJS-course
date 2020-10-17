@@ -6,6 +6,7 @@ const {
   getContactById,
   deleteContact,
   updateContact,
+  validateId,
   validateCreateContact,
   validateUpdateContact,
 } = require('./contacts.controller');
@@ -22,14 +23,23 @@ router.get('/', async (req, res, next) => {
   getContacts(req, res).catch(next);
 });
 
-router.get('/:contactId', asyncHandler(getContactById));
+router.get(
+  '/:contactId',
+  asyncHandler(validateId),
+  asyncHandler(getContactById),
+);
 
 router.patch(
   '/:contactId',
+  asyncHandler(validateId),
   asyncHandler(validateUpdateContact),
   asyncHandler(updateContact),
 );
 
-router.delete('/:contactId', asyncHandler(deleteContact));
+router.delete(
+  '/:contactId',
+  asyncHandler(validateId),
+  asyncHandler(deleteContact),
+);
 
 exports.contactsRouter = router;

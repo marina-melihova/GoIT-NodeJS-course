@@ -10,16 +10,12 @@ const schemaCreateContact = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   phone: Joi.string().required(),
-  password: Joi.string().min(8).required(),
-  subscription: Joi.string().required(),
 });
 
 const schemaUpdateContact = Joi.object({
   name: Joi.string().empty(''),
   email: Joi.string().email().empty(''),
   phone: Joi.string().empty(''),
-  password: Joi.string().min(8).empty(''),
-  subscription: Joi.string().empty(''),
 });
 
 const optionsValBody = {

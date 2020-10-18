@@ -4,9 +4,7 @@ const { Schema } = mongoose;
 const contactsSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
   phone: { type: String, required: true },
-  subscription: { type: String, required: true },
 });
 
 // collection name => contacts

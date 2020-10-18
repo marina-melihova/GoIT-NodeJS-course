@@ -4,22 +4,18 @@ const options = {
   stripUnknown: true,
 };
 
-const validate = function (schema, reqPart = 'body') {
-  return (req, res, next) => {
-    const validationResult = schema.validate(req[reqPart], options);
+const validate = (schema, reqPart = 'body') => (req, res, next) => {
+  const validationResult = schema.validate(req[reqPart], options);
 
-    if (validationResult.error) {
-      error.status = 400;
+  if (validationResult.error) {
+    const errMsg = `Validation error: ${validationResult.error.details
+      .map(item => item.message)
+      .join(', ')}`;
 
-      error.message = `Validation error: ${error.details
-        .map(item => item.message)
-        .join(', ')}`;
-
-      return res.status(400).json(validationResult.error);
-    }
-    req[reqPart] = validationResult.value;
-    next();
-  };
+    return res.status(400).json({ message: errMsg });
+  }
+  req[reqPart] = validationResult.value;
+  next();
 };
 
 module.exports = { validate };

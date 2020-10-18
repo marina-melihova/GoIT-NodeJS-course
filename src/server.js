@@ -62,14 +62,6 @@ class CrudServer {
 
   initErrorHandling() {
     this.app.use((err, req, res, next) => {
-      if (err.name === 'ValidationError') {
-        err.status = 400;
-        if (err.details) {
-          err.message = `Validation error: ${err.details
-            .map(item => item.message)
-            .join(', ')}`;
-        }
-      }
       const statusCode = err.status || 500;
       res.status(statusCode);
       res.json({ message: err.message });

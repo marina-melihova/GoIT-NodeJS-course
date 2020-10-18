@@ -2,52 +2,6 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const { ContactModel } = require('./contacts.model');
 
-const schemaId = Joi.object({
-  contactId: Joi.objectId(),
-});
-
-const schemaCreateContact = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required(),
-});
-
-const schemaUpdateContact = Joi.object({
-  name: Joi.string().empty(''),
-  email: Joi.string().email().empty(''),
-  phone: Joi.string().empty(''),
-});
-
-const optionsValBody = {
-  abortEarly: false,
-  allowUnknown: true,
-  stripUnknown: true,
-};
-
-const validateId = async (req, res, next) => {
-  const value = await schemaId.validateAsync(req.params);
-  req.params = value;
-  next();
-};
-
-const validateCreateContact = async (req, res, next) => {
-  const value = await schemaCreateContact.validateAsync(
-    req.body,
-    optionsValBody,
-  );
-  req.body = value;
-  next();
-};
-
-const validateUpdateContact = async (req, res, next) => {
-  const value = await schemaUpdateContact.validateAsync(
-    req.body,
-    optionsValBody,
-  );
-  req.body = value;
-  next();
-};
-
 const createContact = async (req, res) => {
   const newContact = await ContactModel.create(req.body);
   res.status(201);
@@ -91,13 +45,29 @@ const deleteContact = async (req, res) => {
   res.json({ message: 'contact deleted' });
 };
 
+const schemaId = Joi.object({
+  contactId: Joi.objectId(),
+});
+
+const schemaCreateContact = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().required(),
+});
+
+const schemaUpdateContact = Joi.object({
+  name: Joi.string().empty(''),
+  email: Joi.string().email().empty(''),
+  phone: Joi.string().empty(''),
+});
+
 module.exports = {
   createContact,
   getContacts,
   getContactById,
   updateContact,
   deleteContact,
-  validateId,
-  validateCreateContact,
-  validateUpdateContact,
+  schemaId,
+  schemaCreateContact,
+  schemaUpdateContact,
 };

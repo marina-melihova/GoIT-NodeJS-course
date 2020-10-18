@@ -1,45 +1,37 @@
 const { Router } = require('express');
 const asyncHandler = require('express-async-handler');
-const {
-  createContact,
-  getContacts,
-  getContactById,
-  deleteContact,
-  updateContact,
-  validateId,
-  validateCreateContact,
-  validateUpdateContact,
-} = require('./contacts.controller');
+const { validate } = require('../helpers/validate');
+const contactsController = require('./contacts.controller');
 
 const router = Router();
 
 router.post(
   '/',
-  asyncHandler(validateCreateContact),
-  asyncHandler(createContact),
+  validate(contactsController.schemaCreateContact),
+  asyncHandler(contactsController.createContact),
 );
 
 router.get('/', async (req, res, next) => {
-  getContacts(req, res).catch(next);
+  contactsController.getContacts(req, res).catch(next);
 });
 
 router.get(
   '/:contactId',
-  asyncHandler(validateId),
-  asyncHandler(getContactById),
+  validate(contactsController.schemaId, 'params'),
+  asyncHandler(contactsController.getContactById),
 );
 
 router.patch(
   '/:contactId',
-  asyncHandler(validateId),
-  asyncHandler(validateUpdateContact),
-  asyncHandler(updateContact),
+  validate(contactsController.schemaId, 'params'),
+  validate(contactsController.schemaUpdateContact),
+  asyncHandler(contactsController.updateContact),
 );
 
 router.delete(
   '/:contactId',
-  asyncHandler(validateId),
-  asyncHandler(deleteContact),
+  validate(contactsController.schemaId, 'params'),
+  asyncHandler(contactsController.deleteContact),
 );
 
 exports.contactsRouter = router;

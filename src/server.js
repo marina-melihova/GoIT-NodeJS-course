@@ -5,7 +5,10 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
-const { contactsRouter } = require('./contacts/contacts.router');
+const contactsRouter = require('./api/contacts/contactsRouter');
+const authRouter = require('./api/auth/authRouter');
+const userRouter = require('./api/users/usersRouter');
+const expressDomain = require('express-domain-middleware');
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'),
@@ -17,13 +20,12 @@ class CrudServer {
     this.app = null;
   }
 
-  async start() {
+  async setup() {
     this.initServer();
     await this.initDatabase();
     this.initMiddlewares();
     this.initRouters();
     this.initErrorHandling();
-    this.startListening();
   }
 
   initServer() {
@@ -45,13 +47,17 @@ class CrudServer {
   }
 
   initMiddlewares() {
-    this.app.use(cors({ origin: process.env.ORIGIN }));
-    this.app.use(express.json());
+    this.app.use(expressDomain);
     this.app.use(morgan('combined', { stream: accessLogStream }));
+    this.app.use(cors({ origin: process.env.ORIGIN }));
+    this.app.use(express.urlencoded({ extended: false }));
+    this.app.use(express.json());
   }
 
   initRouters() {
-    this.app.use('/api/contacts', contactsRouter);
+    this.app.use('/contacts', contactsRouter);
+    this.app.use('/auth', authRouter);
+    this.app.use('/users', userRouter);
     this.app.use((req, res) =>
       res.status(404).json({
         message: 'Not found',
@@ -62,9 +68,20 @@ class CrudServer {
 
   initErrorHandling() {
     this.app.use((err, req, res, next) => {
-      const statusCode = err.status || 500;
+      if (err.name === 'ValidationError') {
+        err.message = `Validation error: ${err.details
+          .map(item => item.message)
+          .join(', ')}`;
+        return res.status(400).json({ message: err.message });
+      }
+      next(err);
+    });
+
+    this.app.use((err, req, res, next) => {
+      const statusCode = err.statusCode || 500;
+      const status = err.status || 'error';
       res.status(statusCode);
-      res.json({ message: err.message });
+      res.json({ status: status, message: err.message });
     });
   }
 
@@ -74,6 +91,9 @@ class CrudServer {
     });
   }
 }
+
+process.on('unhandledRejection', err => {});
+process.on('uncaughtException', err => {});
 
 exports.CrudServer = CrudServer;
 exports.crudServer = new CrudServer();

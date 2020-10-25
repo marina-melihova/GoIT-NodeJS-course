@@ -5,16 +5,13 @@ const options = {
 };
 
 const validate = (schema, reqPart = 'body') => (req, res, next) => {
-  const validationResult = schema.validate(req[reqPart], options);
+  const { value, error } = schema.validate(req[reqPart], options);
 
-  if (validationResult.error) {
-    const errMsg = `Validation error: ${validationResult.error.details
-      .map(item => item.message)
-      .join(', ')}`;
-
-    return res.status(400).json({ message: errMsg });
+  if (error) {
+    return next(error);
   }
-  req[reqPart] = validationResult.value;
+
+  req[reqPart] = value;
   next();
 };
 

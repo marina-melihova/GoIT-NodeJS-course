@@ -1,23 +1,23 @@
 const Joi = require('joi');
+const AppError = require('../../helpers/appError');
 Joi.objectId = require('joi-objectid')(Joi);
-const { ContactModel } = require('./contacts.model');
+const ContactModel = require('./contactsModel');
 
 const createContact = async (req, res) => {
-  const newContact = await ContactModel.create(req.body);
-  res.status(201);
-  res.json(newContact);
+  const newContact = await ContactModel.addContact(req.body);
+  res.status(201).json(newContact);
 };
 
 const getContacts = async (req, res) => {
-  const contacts = await ContactModel.find();
+  const contacts = await ContactModel.getContacts();
   res.json(contacts);
 };
 
 const getContactById = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await ContactModel.findById(contactId);
+  const contact = await ContactModel.getContactById(contactId);
   if (!contact) {
-    return res.status(404).json({ message: 'Not found' });
+    return next(new AppError(`No contact has found with that ID`, 404));
   }
   res.json(contact);
 };
@@ -27,20 +27,18 @@ const updateContact = async (req, res) => {
     return res.status(400).json({ message: 'missing fields' });
   }
   const { contactId } = req.params;
-  const contact = await ContactModel.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
+  const contact = await ContactModel.updateContact(contactId, req.body);
   if (!contact) {
-    return res.status(404).json({ message: 'Not found' });
+    return next(new AppError(`No contact has found with that ID`, 404));
   }
   res.json(contact);
 };
 
 const deleteContact = async (req, res) => {
   const { contactId } = req.params;
-  const deleteResult = await ContactModel.deleteOne({ _id: contactId });
+  const deleteResult = await ContactModel.deleteContact({ _id: contactId });
   if (!deleteResult.deletedCount) {
-    return res.status(404).json({ message: 'Not found' });
+    return next(new AppError(`No contact has found with that ID`, 404));
   }
   res.json({ message: 'contact deleted' });
 };

@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const asyncHandler = require('express-async-handler');
-const { validate } = require('../helpers/validate');
-const contactsController = require('./contacts.controller');
+const { validate } = require('../../helpers/validate');
+const contactsController = require('./contactsController');
 
 const router = Router();
 
@@ -11,9 +11,7 @@ router.post(
   asyncHandler(contactsController.createContact),
 );
 
-router.get('/', async (req, res, next) => {
-  contactsController.getContacts(req, res).catch(next);
-});
+router.get('/', asyncHandler(contactsController.getContacts));
 
 router.get(
   '/:contactId',
@@ -34,4 +32,4 @@ router.delete(
   asyncHandler(contactsController.deleteContact),
 );
 
-exports.contactsRouter = router;
+module.exports = router;

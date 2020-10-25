@@ -22,10 +22,7 @@ const signUp = async (req, res, next) => {
     parseInt(process.env.SALT_ROUNDS),
   );
 
-  const newUser = await UserModel.addUser({
-    email,
-    password,
-  });
+  const newUser = await UserModel.addUser({ email, password });
 
   res.status(201).json({
     id: newUser._id,

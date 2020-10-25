@@ -31,13 +31,14 @@ class UserModel {
   }
 
   async addUser(user) {
-    try {
-      const result = await this.db.create(user);
-      console.log('result', result);
-      return result;
-    } catch (error) {
-      console.log('error in model', error);
-    }
+    // try {
+    //   const result = await this.db.create(user);
+    //   console.log('result', result);
+    //   return result;
+    // } catch (error) {
+    //   console.log('error in model', error);
+    // }
+    return await this.db.create(user);
   }
 
   async updateUser(id, props) {

@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
+  avatarURL: String,
   subscription: {
     type: String,
     enum: ['free', 'pro', 'premium'],
@@ -40,15 +41,21 @@ class UserModel {
     });
   }
 
-  async updateToken(id, newToken) {
+  async updateToken(id, token) {
     return await this.db.findByIdAndUpdate(id, {
-      token: newToken,
+      token,
     });
   }
 
-  async updateSubscr(id, newSubscr) {
+  async updateSubscr(id, subscription) {
     return await this.db.findByIdAndUpdate(id, {
-      subscription: newSubscr,
+      subscription,
+    });
+  }
+
+  async updateAvatar(id, avatarUrl) {
+    return await this.db.findByIdAndUpdate(id, {
+      avatarUrl,
     });
   }
 

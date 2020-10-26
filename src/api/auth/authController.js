@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../users/usersModel');
 const Joi = require('joi');
 const AppError = require('../../helpers/appError');
+const { generateAvatar, handleAvatar } = require('../../helpers/uploadAvatar');
 
 const signUp = async (req, res, next) => {
   const { email, password } = req.body;
@@ -16,13 +17,17 @@ const signUp = async (req, res, next) => {
     password,
     parseInt(process.env.SALT_ROUNDS),
   );
-
-  const newUser = await UserModel.addUser({ email, passwordHash });
+  const randomAvatar = await generateAvatar();
+  console.log('randomAvatar', randomAvatar);
+  await handleAvatar(randomAvatar);
+  const avatarUrl = `http://localhost:3000/images/${randomAvatar}`;
+  const newUser = await UserModel.addUser({ email, passwordHash, avatarUrl });
   const { id, subscription } = newUser;
   res.status(201).json({
     id,
     email,
     subscription,
+    avatarUrl,
   });
 };
 

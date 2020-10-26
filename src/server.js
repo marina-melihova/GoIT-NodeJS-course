@@ -9,7 +9,7 @@ const contactsRouter = require('./api/contacts/contactsRouter');
 const authRouter = require('./api/auth/authRouter');
 const userRouter = require('./api/users/usersRouter');
 const expressDomain = require('express-domain-middleware');
-const newAvatar = require('./helpers/generateAvatar');
+const newAvatar = require('./helpers/uploadAvatar');
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'),
@@ -85,6 +85,7 @@ class CrudServer {
     this.app.use((err, req, res, next) => {
       const statusCode = err.statusCode || 500;
       const status = err.status || 'error';
+      console.log('err in last mdw', err);
       res.status(statusCode);
       res.json({ status: status, message: err.message });
     });

@@ -9,7 +9,13 @@ const createContact = async (req, res) => {
 };
 
 const getContacts = async (req, res) => {
-  const contacts = await ContactModel.getContacts();
+  const { page, limit, sub } = req.query;
+  let contacts;
+  if (limit) {
+    contacts = await ContactModel.getContacts(sub, true, page, limit);
+  } else {
+    contacts = await ContactModel.getContacts(sub);
+  }
   res.json(contacts);
 };
 
@@ -17,7 +23,7 @@ const getContactById = async (req, res) => {
   const { contactId } = req.params;
   const contact = await ContactModel.getContactById(contactId);
   if (!contact) {
-    return next(new AppError(`No contact has found with that ID`, 404));
+    return next(new AppError(`No contact found with that ID`, 404));
   }
   res.json(contact);
 };
@@ -29,7 +35,7 @@ const updateContact = async (req, res) => {
   const { contactId } = req.params;
   const contact = await ContactModel.updateContact(contactId, req.body);
   if (!contact) {
-    return next(new AppError(`No contact has found with that ID`, 404));
+    return next(new AppError(`No contact found with that ID`, 404));
   }
   res.json(contact);
 };
@@ -38,7 +44,7 @@ const deleteContact = async (req, res) => {
   const { contactId } = req.params;
   const deleteResult = await ContactModel.deleteContact({ _id: contactId });
   if (!deleteResult.deletedCount) {
-    return next(new AppError(`No contact has found with that ID`, 404));
+    return next(new AppError(`No contact found with that ID`, 404));
   }
   res.json({ message: 'contact deleted' });
 };
@@ -57,6 +63,7 @@ const schemaUpdateContact = Joi.object({
   name: Joi.string().empty(''),
   email: Joi.string().email().empty(''),
   phone: Joi.string().empty(''),
+  subscription: Joi.string().empty('').valid('free', 'pro', 'premium'),
 });
 
 module.exports = {

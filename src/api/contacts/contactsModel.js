@@ -21,8 +21,13 @@ class ContactModel {
     this.db = mongoose.model('Contact', contactSchema);
   }
 
-  async getContacts() {
-    return await this.db.find();
+  async getContacts(sub, pagination = false, page = 1, limit = 10) {
+    let query = {};
+    if (sub) {
+      query = { subscription: sub };
+    }
+    const { docs } = await this.db.paginate(query, { page, limit, pagination });
+    return docs;
   }
 
   async getContactById(id) {

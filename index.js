@@ -1,4 +1,4 @@
-const { crudServer } = require('./src/server');
+const crudServer = require('./src/server');
 crudServer.setup();
 crudServer.startListening();
 

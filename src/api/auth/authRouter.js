@@ -2,12 +2,26 @@ const { Router } = require('express');
 const asyncHandler = require('express-async-handler');
 const { authorize } = require('../../helpers/authorize');
 const { validate } = require('../../helpers/validate');
-const { signUp, signIn, logout, signSchema } = require('./authController');
+const authController = require('./authController');
 
 const router = Router();
 
-router.post('/register', validate(signSchema), asyncHandler(signUp));
-router.post('/login', validate(signSchema), asyncHandler(signIn));
-router.get('/logout', authorize, asyncHandler(logout));
+router.post(
+  '/register',
+  validate(authController.signSchema),
+  asyncHandler(authController.signUp),
+);
+
+router.post(
+  '/login',
+  validate(authController.signSchema),
+  asyncHandler(authController.signIn),
+);
+
+router.post(
+  '/logout',
+  asyncHandler(authorize),
+  asyncHandler(authController.logout),
+);
 
 module.exports = router;

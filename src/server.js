@@ -69,10 +69,13 @@ class CrudServer {
   initErrorHandling() {
     this.app.use((err, req, res, next) => {
       if (err.name === 'ValidationError') {
-        err.message = `Validation error: ${err.details
-          .map(item => item.message)
-          .join(', ')}`;
-        return res.status(400).json({ message: err.message });
+        if (err.details) {
+          err.message = `Validation error: ${err.details
+            .map(item => item.message)
+            .join(', ')}`;
+        }
+        const status = 'fail';
+        return res.status(400).json({ status: status, message: err.message });
       }
       next(err);
     });
@@ -92,8 +95,4 @@ class CrudServer {
   }
 }
 
-process.on('unhandledRejection', err => {});
-process.on('uncaughtException', err => {});
-
-exports.CrudServer = CrudServer;
-exports.crudServer = new CrudServer();
+module.exports = new CrudServer();

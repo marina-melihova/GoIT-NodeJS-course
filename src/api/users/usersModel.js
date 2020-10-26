@@ -9,7 +9,7 @@ const userSchema = new Schema({
     enum: ['free', 'pro', 'premium'],
     default: 'free',
   },
-  token: String,
+  token: { type: String, default: '' },
 });
 
 class UserModel {
@@ -31,13 +31,6 @@ class UserModel {
   }
 
   async addUser(user) {
-    // try {
-    //   const result = await this.db.create(user);
-    //   console.log('result', result);
-    //   return result;
-    // } catch (error) {
-    //   console.log('error in model', error);
-    // }
     return await this.db.create(user);
   }
 
@@ -50,6 +43,12 @@ class UserModel {
   async updateToken(id, newToken) {
     return await this.db.findByIdAndUpdate(id, {
       token: newToken,
+    });
+  }
+
+  async updateSubscr(id, newSubscr) {
+    return await this.db.findByIdAndUpdate(id, {
+      subscription: newSubscr,
     });
   }
 

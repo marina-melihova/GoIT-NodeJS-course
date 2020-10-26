@@ -1,10 +1,32 @@
-const { usersRouter } = require('./usersRouter');
+const Joi = require('joi');
+const UserModel = require('./usersModel');
 
-const getCurrentUser = (req, res, next) => {
-  return res.status(200).send({
-    id: req.user._id,
-    email: req.user.email,
+const getCurrentUser = (req, res) => {
+  const { email, id, subscription, token } = req.user;
+  res.json({
+    id,
+    email,
+    subscription,
+    token,
   });
 };
 
-module.exports = { getCurrentUser };
+const updateSubscription = async (req, res, next) => {
+  const { email, id, token } = req.user;
+  const { subscription } = req.body;
+
+  await UserModel.updateSubscr(id, subscription);
+  req.user.subscription = subscription;
+  res.json({
+    id,
+    email,
+    subscription,
+    token,
+  });
+};
+
+const subscrSchema = Joi.object({
+  subscription: Joi.string().required().valid('free', 'pro', 'premium'),
+});
+
+module.exports = { getCurrentUser, updateSubscription, subscrSchema };

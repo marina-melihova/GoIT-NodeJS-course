@@ -9,6 +9,7 @@ const contactsRouter = require('./api/contacts/contactsRouter');
 const authRouter = require('./api/auth/authRouter');
 const userRouter = require('./api/users/usersRouter');
 const expressDomain = require('express-domain-middleware');
+const newAvatar = require('./helpers/generateAvatar');
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'),
@@ -52,6 +53,7 @@ class CrudServer {
     this.app.use(cors({ origin: process.env.ORIGIN }));
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(express.json());
+    this.app.use(express.static('public'));
   }
 
   initRouters() {

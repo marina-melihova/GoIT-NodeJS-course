@@ -31,12 +31,12 @@ const signIn = async (req, res, next) => {
 
   const user = await UserModel.getUserByEmail(email);
   if (!user) {
-    return next(new AppError('User with such email not found', 404));
+    return next(new AppError('Not authorized', 401));
   }
 
   const isCorrectPassword = await bcryptjs.compare(password, user.passwordHash);
   if (!isCorrectPassword) {
-    return next(new AppError('Provided password is wrong', 403));
+    return next(new AppError('Not authorized', 401));
   }
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {

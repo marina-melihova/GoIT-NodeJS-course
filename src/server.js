@@ -5,10 +5,8 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
-const contactsRouter = require('./api/contacts/contactsRouter');
-const authRouter = require('./api/auth/authRouter');
-const userRouter = require('./api/users/usersRouter');
 const expressDomain = require('express-domain-middleware');
+const router = require('./router');
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'),
@@ -55,9 +53,7 @@ class CrudServer {
   }
 
   initRouters() {
-    this.app.use('/contacts', contactsRouter);
-    this.app.use('/auth', authRouter);
-    this.app.use('/users', userRouter);
+    this.app.use('/api/v1', router);
     this.app.use((req, res) =>
       res.status(404).json({
         message: 'Not found',

@@ -16,8 +16,8 @@ const generateAvatar = async () => {
   const file = fs.createWriteStream(`./tmp/${fileName}`);
   const avatarUrl = generator.generateRandomAvatar();
   http.get(avatarUrl, async response => {
-    const readable = Readable.from(response);
-    readable.pipe(file);
+    // const readable = Readable.from(response);
+    response.pipe(file);
     await finished(file);
     file.close(() => console.log('A new avatar is downloaded'));
   });
@@ -32,9 +32,7 @@ const handleAvatar = async avatar => {
     );
     await imageCompress.quality(80);
   }
-  // const fileName = Date.now() + ext;
   await fsPromise.rename(`./tmp/${avatar}`, `./public/images/${avatar}`);
-  // return fileName;
 };
 
 const storage = multer.diskStorage({

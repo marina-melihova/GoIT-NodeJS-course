@@ -24,6 +24,7 @@ class CrudServer {
     this.initMiddlewares();
     this.initRouters();
     this.initErrorHandling();
+    return this;
   }
 
   initServer() {

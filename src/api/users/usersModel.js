@@ -13,10 +13,12 @@ const userSchema = new Schema({
   token: { type: String, default: '' },
 });
 
+const user = mongoose.model('User', userSchema);
+
 class UserModel {
-  constructor() {
+  constructor(db) {
     // collection name => users
-    this.db = mongoose.model('User', userSchema);
+    this.db = db;
   }
 
   async getUsers() {
@@ -53,9 +55,9 @@ class UserModel {
     });
   }
 
-  async updateAvatar(id, avatarUrl) {
+  async updateAvatar(id, avatarURL) {
     return await this.db.findByIdAndUpdate(id, {
-      avatarUrl,
+      avatarURL,
     });
   }
 
@@ -64,4 +66,5 @@ class UserModel {
   }
 }
 
-module.exports = new UserModel();
+const userModel = new UserModel(user);
+module.exports = userModel;

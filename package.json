@@ -1,24 +1,20 @@
 {
   "name": "GoIT-NodeJS-course",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "homepage": "https://github.com/marina-melihova/GoIT-NodeJS-course#readme",
   "scripts": {
-    "start": "node ./src/index.js",
-    "dev": "nodemon ./src/index.js",
-    "test": "mocha *.test.js"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js",
+    "test": "mocha ./tests/*.test.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/marina-melihova/GoIT-NodeJS-course.git"
   },
-  "keywords": [],
-  "author": "marina-melihova",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/marina-melihova/GoIT-NodeJS-course/issues"
   },
-  "homepage": "https://github.com/marina-melihova/GoIT-NodeJS-course#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^8.2.0",

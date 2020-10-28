@@ -1,5 +1,5 @@
-// const path = require('path');
-require('dotenv').config({ path: './.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
@@ -7,7 +7,7 @@ const chai = require('chai');
 const { authorize } = require('../src/helpers/authorize');
 const UserModel = require('../src/api/users/usersModel');
 
-describe('Authmiddleware test suite', () => {
+describe('Authorization test suite', () => {
   context('No auth header provided', () => {
     let sandbox;
 
@@ -17,8 +17,8 @@ describe('Authmiddleware test suite', () => {
 
     before(async () => {
       sandbox = sinon.createSandbox();
-      res = { status: sandbox.stub(), send: sandbox.stub() };
-      res.status.returns(res);
+      res = { status: sandbox.stub(), json: sandbox.stub() };
+      // res.status.returns(res);
       next = sandbox.stub();
       sandbox.stub(UserModel, 'getUserById');
 
@@ -34,12 +34,13 @@ describe('Authmiddleware test suite', () => {
       sinon.assert.calledWithExactly(res.status, 401);
     });
     it('should call res.send once', () => {
-      sinon.assert.calledOnce(res.send);
+      sinon.assert.calledOnce(res.json);
     });
 
     it('should not call findById', () => {
       sinon.assert.notCalled(UserModel.getUserById);
     });
+
     it('should not call next()', () => {
       sinon.assert.notCalled(next);
     });
@@ -70,6 +71,7 @@ describe('Authmiddleware test suite', () => {
       sinon.assert.calledOnce(res.status);
       sinon.assert.calledWithExactly(res.status, 401);
     });
+
     it('should call res.send once', () => {
       sinon.assert.calledOnce(res.send);
     });
@@ -77,6 +79,7 @@ describe('Authmiddleware test suite', () => {
     it('should not call findById', () => {
       sinon.assert.notCalled(UserModel.getUserById);
     });
+
     it('should not call next()', () => {
       sinon.assert.notCalled(next);
     });
@@ -109,6 +112,7 @@ describe('Authmiddleware test suite', () => {
     it('should not call res.status once', () => {
       sinon.assert.notCalled(res.status);
     });
+
     it('should not call res.send once', () => {
       sinon.assert.notCalled(res.send);
     });

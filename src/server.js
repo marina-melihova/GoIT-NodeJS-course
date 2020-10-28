@@ -5,11 +5,8 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
-const contactsRouter = require('./api/contacts/contactsRouter');
-const authRouter = require('./api/auth/authRouter');
-const userRouter = require('./api/users/usersRouter');
 const expressDomain = require('express-domain-middleware');
-const newAvatar = require('./helpers/uploadAvatar');
+const router = require('./router');
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'),
@@ -57,9 +54,7 @@ class CrudServer {
   }
 
   initRouters() {
-    this.app.use('/contacts', contactsRouter);
-    this.app.use('/auth', authRouter);
-    this.app.use('/users', userRouter);
+    this.app.use('/api/v1', router);
     this.app.use((req, res) =>
       res.status(404).json({
         message: 'Not found',
@@ -83,9 +78,9 @@ class CrudServer {
     });
 
     this.app.use((err, req, res, next) => {
+      console.log('err in last mdlw', err);
       const statusCode = err.statusCode || 500;
       const status = err.status || 'error';
-      console.log('err in last mdw', err);
       res.status(statusCode);
       res.json({ status: status, message: err.message });
     });

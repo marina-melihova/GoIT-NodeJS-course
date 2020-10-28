@@ -3,7 +3,6 @@ const fs = require('fs');
 const { promises: fsPromise } = fs;
 const path = require('path');
 const stream = require('stream');
-const { Readable } = stream;
 const { promisify } = require('util');
 const finished = promisify(stream.finished);
 const multer = require('multer');
@@ -16,10 +15,9 @@ const generateAvatar = async () => {
   const file = fs.createWriteStream(`./tmp/${fileName}`);
   const avatarUrl = generator.generateRandomAvatar();
   http.get(avatarUrl, async response => {
-    // const readable = Readable.from(response);
     response.pipe(file);
     await finished(file);
-    file.close(() => console.log('A new avatar is downloaded'));
+    file.close();
   });
   return fileName;
 };

@@ -1,134 +1,176 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
-
+require('dotenv').config({ path: './.env' });
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
-const chai = require('chai');
+const { assert } = require('chai');
 const { authorize } = require('../src/helpers/authorize');
 const UserModel = require('../src/api/users/usersModel');
+const AppError = require('../src/helpers/appError');
 
-describe('Authorization test suite', () => {
-  context('No auth header provided', () => {
-    let sandbox;
+describe('Authmiddleware test suite', () => {
+  let sandbox;
+  let getUserByIdStub;
+  let nextStub;
 
-    const req = { headers: {} };
-    let res;
-    let next;
+  before(async () => {
+    sandbox = sinon.createSandbox();
+    getUserByIdStub = sandbox.stub(UserModel, 'getUserById');
+    nextStub = sandbox.stub();
+  });
+
+  after(() => {
+    sandbox.restore();
+  });
+
+  context('when auth header not provided', () => {
+    const request = { headers: { authorization: '' } };
 
     before(async () => {
-      sandbox = sinon.createSandbox();
-      res = { status: sandbox.stub(), json: sandbox.stub() };
-      // res.status.returns(res);
-      next = sandbox.stub();
-      sandbox.stub(UserModel, 'getUserById');
-
-      await authorize(req, res, next);
+      await authorize(request, null, nextStub);
     });
 
     after(() => {
-      sandbox.restore();
+      sandbox.reset();
     });
 
-    it('should call res.status once', () => {
-      sinon.assert.calledOnce(res.status);
-      sinon.assert.calledWithExactly(res.status, 401);
-    });
-    it('should call res.send once', () => {
-      sinon.assert.calledOnce(res.json);
+    it('should not call getUserById', () => {
+      sinon.assert.notCalled(getUserByIdStub);
     });
 
-    it('should not call findById', () => {
-      sinon.assert.notCalled(UserModel.getUserById);
+    it('request should contain user info', () => {
+      assert.strictEqual(request.user, undefined);
     });
 
-    it('should not call next()', () => {
-      sinon.assert.notCalled(next);
+    it('should call next once', () => {
+      sinon.assert.calledOnce(nextStub);
+      sinon.assert.calledWithExactly(
+        nextStub,
+        sinon.match.instanceOf(AppError),
+      );
     });
   });
 
-  context('jwt token is invalid', () => {
-    let sandbox;
-
-    const req = { headers: { authorization: '' } };
-    let res;
-    let next;
+  context('when token verification fails', () => {
+    const request = { headers: { authorization: 'Bearer test_token' } };
 
     before(async () => {
-      sandbox = sinon.createSandbox();
-      res = { status: sandbox.stub(), send: sandbox.stub() };
-      res.status.returns(res);
-      next = sandbox.stub();
-      sandbox.stub(UserModel, 'getUserById');
-
-      await authorize(req, res, next);
+      await authorize(request, null, nextStub);
     });
 
     after(() => {
-      sandbox.restore();
+      sandbox.reset();
     });
 
-    it('should call res.status once', () => {
-      sinon.assert.calledOnce(res.status);
-      sinon.assert.calledWithExactly(res.status, 401);
+    it('should not call getUserById', () => {
+      sinon.assert.notCalled(getUserByIdStub);
     });
 
-    it('should call res.send once', () => {
-      sinon.assert.calledOnce(res.send);
+    it('request should not contain user info', () => {
+      assert.strictEqual(request.user, undefined);
     });
 
-    it('should not call findById', () => {
-      sinon.assert.notCalled(UserModel.getUserById);
-    });
-
-    it('should not call next()', () => {
-      sinon.assert.notCalled(next);
+    it('should call next once', () => {
+      sinon.assert.calledOnce(nextStub);
+      sinon.assert.calledWithExactly(
+        nextStub,
+        sinon.match.instanceOf(AppError),
+      );
     });
   });
 
-  context('everything is ok', () => {
-    let sandbox;
-
-    const userId = 'user_id';
-    const user = { id: 'users_info_from_DB' };
-    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET);
-    const req = { headers: { authorization: `Bearer ${token}` } };
-    let res;
-    let next;
+  context('when corresponding user not found', () => {
+    const token = jwt.sign({ userId: 'user_id' }, process.env.JWT_SECRET);
+    const request = { headers: { authorization: `Bearer ${token}` } };
 
     before(async () => {
-      sandbox = sinon.createSandbox();
-      res = { status: sandbox.stub(), send: sandbox.stub() };
-      res.status.returns(res);
-      next = sandbox.stub();
-      sandbox.stub(UserModel, 'getUserById').resolves(user);
-
-      await authorize(req, res, next);
+      await authorize(request, null, nextStub);
     });
 
     after(() => {
-      sandbox.restore();
+      sandbox.reset();
     });
 
-    it('should not call res.status once', () => {
-      sinon.assert.notCalled(res.status);
+    it('should call getUserById once', () => {
+      sinon.assert.calledOnce(getUserByIdStub);
+      sinon.assert.calledWithExactly(getUserByIdStub, 'user_id');
     });
 
-    it('should not call res.send once', () => {
-      sinon.assert.notCalled(res.send);
+    it('request should not contain user info', () => {
+      assert.strictEqual(request.user, undefined);
     });
 
-    it('should call findById once', () => {
-      sinon.assert.calledOnce(UserModel.getUserById);
-      sinon.assert.calledWithExactly(UserModel.getUserById, userId);
+    it('should call next once', () => {
+      sinon.assert.calledOnce(nextStub);
+      sinon.assert.calledWithExactly(
+        nextStub,
+        sinon.match.instanceOf(AppError),
+      );
+    });
+  });
+
+  context('when user with this token has already logged out', () => {
+    const token = jwt.sign({ userId: 'user_id' }, process.env.JWT_SECRET);
+    const request = { headers: { authorization: `Bearer ${token}` } };
+    const user = {
+      id: 'user_id',
+      token: null,
+    };
+
+    before(async () => {
+      getUserByIdStub.resolves(user);
+      await authorize(request, null, nextStub);
     });
 
-    it('should pass user to req', () => {
-      chai.assert.equal(req.user, user);
+    after(() => {
+      sandbox.reset();
     });
 
-    it('should call next() once', () => {
-      sinon.assert.calledOnce(next);
-      sinon.assert.calledWithExactly(next);
+    it('should call getUserById once', () => {
+      sinon.assert.calledOnce(getUserByIdStub);
+      sinon.assert.calledWithExactly(getUserByIdStub, user.id);
+    });
+
+    it('request should not contain user info', () => {
+      assert.strictEqual(request.user, undefined);
+    });
+
+    it('should call next once', () => {
+      sinon.assert.calledOnce(nextStub);
+      sinon.assert.calledWithExactly(
+        nextStub,
+        sinon.match.instanceOf(AppError),
+      );
+    });
+  });
+
+  context('when everything is OK', () => {
+    const token = jwt.sign({ userId: 'user_id' }, process.env.JWT_SECRET);
+    const request = { headers: { authorization: `Bearer ${token}` } };
+    const user = {
+      id: 'user_id',
+      token: token,
+    };
+
+    before(async () => {
+      getUserByIdStub.resolves(user);
+      await authorize(request, null, nextStub);
+    });
+
+    after(() => {
+      sandbox.reset();
+    });
+
+    it('should call getUserById once', () => {
+      sinon.assert.calledOnce(getUserByIdStub);
+      sinon.assert.calledWithExactly(getUserByIdStub, user.id);
+    });
+
+    it('request should contain user info', () => {
+      assert.strictEqual(request.user, user);
+    });
+
+    it('should call next once', () => {
+      sinon.assert.calledOnce(nextStub);
+      sinon.assert.calledWithExactly(nextStub);
     });
   });
 });

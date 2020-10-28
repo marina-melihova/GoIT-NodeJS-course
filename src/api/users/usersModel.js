@@ -13,12 +13,10 @@ const userSchema = new Schema({
   token: { type: String, default: '' },
 });
 
-const user = mongoose.model('User', userSchema);
-
 class UserModel {
   constructor(db) {
     // collection name => users
-    this.db = db;
+    this.db = mongoose.model('User', userSchema);
   }
 
   async getUsers() {
@@ -66,5 +64,4 @@ class UserModel {
   }
 }
 
-const userModel = new UserModel(user);
-module.exports = userModel;
+module.exports = new UserModel();

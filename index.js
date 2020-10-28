@@ -1,5 +1,5 @@
 const crudServer = require('./src/server');
-crudServer.setup();
+await crudServer.setup();
 crudServer.startListening();
 
 process.on('unhandledRejection', err => {

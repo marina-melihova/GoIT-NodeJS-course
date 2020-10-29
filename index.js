@@ -1,9 +1,9 @@
-const crudServer = require('./src/server');
+const CrudServer = require('./src/server');
 
-crudServer
+crudServer = new CrudServer()
   .setup()
   .then(server => server.startListening())
-  .catch(err => console.log('server not setup', err));
+  .catch(console.log);
 
 process.on('unhandledRejection', err => {
   throw err;

@@ -13,55 +13,55 @@ const userSchema = new Schema({
   token: { type: String, default: '' },
 });
 
-class UserModel {
-  constructor(db) {
-    // collection name => users
-    this.db = mongoose.model('User', userSchema);
-  }
+userSchema.statics.getUserById = getUserById;
+userSchema.statics.getUsers = getUsers;
+userSchema.statics.addUser = addUser;
+userSchema.statics.updateUser = updateUser;
+userSchema.statics.deleteUser = deleteUser;
+userSchema.statics.getUserByEmail = getUserByEmail;
+userSchema.statics.updateToken = updateToken;
+userSchema.statics.updateSubscr = updateSubscr;
+userSchema.statics.updateAvatar = updateAvatar;
 
-  async getUsers() {
-    return await this.db.find();
-  }
-
-  async getUserById(id) {
-    return await this.db.findById(id);
-  }
-
-  async getUserByEmail(email) {
-    return await this.db.findOne({ email });
-  }
-
-  async addUser(user) {
-    return await this.db.create(user);
-  }
-
-  async updateUser(id, props) {
-    return await this.db.findByIdAndUpdate(id, props, {
-      new: true,
-    });
-  }
-
-  async updateToken(id, token) {
-    return await this.db.findByIdAndUpdate(id, {
-      token,
-    });
-  }
-
-  async updateSubscr(id, subscription) {
-    return await this.db.findByIdAndUpdate(id, {
-      subscription,
-    });
-  }
-
-  async updateAvatar(id, avatarURL) {
-    return await this.db.findByIdAndUpdate(id, {
-      avatarURL,
-    });
-  }
-
-  async deleteUser(id) {
-    return await this.db.findByIdAndRemove(id);
-  }
+async function getUsers() {
+  return await this.find();
 }
 
-module.exports = new UserModel();
+async function getUserById(id) {
+  return await this.findById(id);
+}
+
+async function addUser(user) {
+  return await this.create(user);
+}
+
+async function updateUser(userId, updateParams) {
+  return await this.findByIdAndUpdate(userId, updateParams, { new: true });
+}
+
+async function deleteUser(id) {
+  return await this.deleteOne(id);
+}
+
+async function getUserByEmail(email) {
+  return await this.findOne({ email });
+}
+
+async function updateToken(id, token) {
+  return await this.findByIdAndUpdate(id, { token });
+}
+
+async function updateSubscr(id, subscription) {
+  return await this.findByIdAndUpdate(id, {
+    subscription,
+  });
+}
+
+async function updateAvatar(id, avatarURL) {
+  return this.findByIdAndUpdate(id, {
+    avatarURL,
+  });
+}
+
+// users
+module.exports = mongoose.model('User', userSchema);

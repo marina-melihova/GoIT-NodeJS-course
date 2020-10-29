@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "homepage": "https://github.com/marina-melihova/GoIT-NodeJS-course#readme",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "scripts": {
     "start": "node ./index.js",
     "dev": "nodemon ./index.js",
-    "test-mocha": "mocha ./tests/*.test.js --exit--timeout 5000",
-    "test-jest": "jest --forceExit"
+    "test-mocha": "mocha ./tests/auth.test.js --exit--timeout 5000",
+    "test-jest": "jest ./tests/updateAvatar.test.js --forceExit"
   },
   "repository": {
     "type": "git",

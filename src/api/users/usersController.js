@@ -4,8 +4,8 @@ const UserModel = require('./usersModel');
 const { handleAvatar } = require('../../helpers/uploadAvatar');
 
 const getCurrentUser = (req, res) => {
-  const { email, id, avatarURL, subscription, token } = req.user;
-  return res.json({ id, email, avatarURL, subscription, token });
+  const { email, _id, avatarURL, subscription, token } = req.user;
+  return res.json({ _id, email, avatarURL, subscription, token });
 };
 
 const updateAvatar = async (req, res) => {
@@ -15,21 +15,21 @@ const updateAvatar = async (req, res) => {
     await handleAvatar(avatarFilename);
     const newAvatarUrl = `http://localhost:3000/images/${avatarFilename}`;
 
-    await UserModel.updateAvatar(user.id, newAvatarUrl);
+    await UserModel.updateAvatar(user._id, newAvatarUrl);
     user.avatarURL = newAvatarUrl;
-    const { id, email, avatarURL, subscription, token } = user;
-    return res.json({ id, email, avatarURL, subscription, token });
+    const { _id, email, avatarURL, subscription, token } = user;
+    return res.send({ _id, email, avatarURL, subscription, token });
   }
-  return res.status(400).json({ message: 'Please, send a valid image.' });
+  return res.status(400).send({ message: 'Please, send a valid image.' });
 };
 
 const updateSubscription = async (req, res) => {
-  const { email, id, avatarURL, token } = req.user;
+  const { email, _id, avatarURL, token } = req.user;
   const { subscription } = req.body;
 
-  await UserModel.updateSubscr(id, subscription);
+  await UserModel.updateSubscr(_id, subscription);
   req.user.subscription = subscription;
-  return res.json({ id, email, avatarURL, subscription, token });
+  return res.json({ _id, email, avatarURL, subscription, token });
 };
 
 const subscrSchema = Joi.object({

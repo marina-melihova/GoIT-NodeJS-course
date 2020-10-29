@@ -11,8 +11,8 @@ router.get('/current', asyncHandler(authorize), usersController.getCurrentUser);
 
 router.patch(
   '/avatar',
-  asyncHandler(authorize),
   upload.single('avatar'),
+  asyncHandler(authorize),
   asyncHandler(usersController.updateAvatar),
 );
 

@@ -45,7 +45,7 @@ class ContactModel {
   }
 
   async deleteContact(id) {
-    return await this.db.findByIdAndRemove(id);
+    return await this.db.deleteOne(id);
   }
 }
 

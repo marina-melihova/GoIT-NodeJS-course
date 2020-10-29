@@ -22,7 +22,7 @@ const authorize = async (req, res, next) => {
     return next(new AppError('Not authorized', 401));
   }
   req.user = user;
-  next();
+  return next();
 };
 
 module.exports = { authorize };

@@ -73,17 +73,17 @@ class CrudServer {
             .join(', ')}`;
         }
         const status = 'fail';
-        return res.status(400).json({ status: status, message: err.message });
+        return res.status(400).send({ status: status, message: err.message });
       }
-      next(err);
+      return next(err);
     });
 
     this.app.use((err, req, res, next) => {
-      console.log('err in last mdlw', err);
-      const statusCode = err.statusCode || 500;
-      const status = err.status || 'error';
-      res.status(statusCode);
-      res.json({ status: status, message: err.message });
+      const status = err.status || 500;
+      const statusName = err.statusName || 'error';
+      return res
+        .status(status)
+        .send({ status: statusName, message: err.message });
     });
   }
 
@@ -94,4 +94,4 @@ class CrudServer {
   }
 }
 
-module.exports = new CrudServer();
+module.exports = CrudServer;

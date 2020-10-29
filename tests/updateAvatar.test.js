@@ -1,80 +1,70 @@
 require('dotenv').config({ path: './.env' });
-// const path = require('path');
+const path = require('path');
+const { promises: fsPromises } = require('fs');
 const jwt = require('jsonwebtoken');
-const { default: context } = require('jest-plugin-context');
 const supertest = require('supertest');
-// const chai = require('chai');
-const expect = require('chai').expect;
 const UserModel = require('../src/api/users/usersModel');
-const crudServer = require('../src/server');
+const CrudServer = require('../src/server');
 
 describe('Update avatar Test Suite', () => {
   const fileName = 'avatar.svg';
-  // const imgFile = path.join(__dirname, `../public/images/${fileName}`);
-  const imgFile = `./public/images/${fileName}`;
+  const imgFile = path.join(__dirname, `../public/images/${fileName}`);
   let app;
-  let server;
   let request;
   let response;
 
   beforeAll(async () => {
-    server = await crudServer.setup();
+    const server = await new CrudServer().setup();
     app = server.app;
     request = supertest(app);
   });
 
-  context('when bad token was provided', () => {
-    before(async () => {
-      response = await supertest(server)
+  describe('when bad token was provided', () => {
+    it('should return 401 error', async () => {
+      response = await request
         .patch('/api/v1/users/avatar')
-        .set('Authorization', '')
-        .attach('avatar', imgFile);
-    });
-
-    it('should return 401 error', () => {
-      expect(response.status).toEqual(401);
+        .set('Authorization', 'Bearer bad_token')
+        .attach('avatar', imgFile)
+        .expect(401);
     });
   });
 
-  context('when good token was provided', () => {
-    // const newUser = {
-    //   email: 'testUser@email.com',
-    //   password: 'qwerty12',
-    // };
-    const userDoc = await userModel.create({
-      email: 'testUser@email.com',
-      passwordHash: 'password_hash',
-    });
-
-    let createdUser, token;
+  describe('when good token was provided', () => {
+    let userDoc, updatedUser, token;
 
     beforeAll(async () => {
-      createdUser = await UserModel.getUserByEmail('testUser@email.com'); //?
-      console.log(createdUser); //?
-      token = jwt.sign({ userId: createdUser.id }, process.env.JWT_SECRET);
+      userDoc = await UserModel.addUser({
+        email: 'test@email.com',
+        passwordHash: 'password_hash',
+      });
 
-      response = await supertest(server)
-        .patch('/users/avatar')
+      token = jwt.sign({ userId: userDoc._id }, process.env.JWT_SECRET);
+      await UserModel.updateToken(userDoc._id, token);
+
+      response = await request
+        .patch('/api/v1/users/avatar')
         .set('Authorization', `Bearer ${token}`)
         .attach('avatar', imgFile);
-      
-      updatedUser = await UserModel.getUserById(createdUser.id); //?
     });
 
-    // after(async () => {
-    //   await userModel.findByIdAndDelete(userDoc._id);
-    // });
+    afterAll(async () => {
+      await UserModel.deleteUser(userDoc._id);
+      const { base } = path.parse(response.body.avatarURL);
+      const testFile = path.join(__dirname, `../public/images/${base}`);
+      await fsPromises.unlink(testFile);
+    });
 
     it('should return 200 successfull response', () => {
       expect(response.status).toEqual(200);
     });
 
     it('should return expected result', () => {
-      expect(response.body).toHaveProperty(avatarURL);
+      expect(response.body).toHaveProperty('avatarURL');
     });
 
-    it("should create new field in user's document", () => {
-      expect(updatedUser).toHaveProperty(avatarURL);
+    it("should create new field in user's document", async () => {
+      updatedUser = await UserModel.getUserById(userDoc._id);
+      expect(updatedUser).toHaveProperty('avatarURL');
     });
   });
 });

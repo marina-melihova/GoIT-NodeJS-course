@@ -21,9 +21,9 @@ const signUp = async (req, res, next) => {
   await handleAvatar(randomAvatar);
   const avatarURL = `http://localhost:3000/images/${randomAvatar}`;
   const newUser = await UserModel.addUser({ email, passwordHash, avatarURL });
-  const { id, subscription } = newUser;
-  res.status(201).json({
-    id,
+  const { _id, subscription } = newUser;
+  return res.status(201).send({
+    _id,
     email,
     subscription,
     avatarURL,

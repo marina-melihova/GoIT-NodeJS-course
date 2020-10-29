@@ -88,7 +88,7 @@ class CrudServer {
   }
 
   startListening() {
-    this.app.listen(process.env.PORT, () => {
+    return this.app.listen(process.env.PORT, () => {
       console.log('Server started listening on port', process.env.PORT);
     });
   }

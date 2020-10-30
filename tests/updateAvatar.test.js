@@ -9,23 +9,27 @@ const CrudServer = require('../src/server');
 describe('Update avatar Test Suite', () => {
   const fileName = 'avatar.svg';
   const imgFile = path.join(__dirname, `../public/images/${fileName}`);
-  let app;
   let request;
   let response;
 
   beforeAll(async () => {
     const server = await new CrudServer().setup();
-    app = server.app;
-    request = supertest(app);
+    request = supertest(server.app);
+    process.on('unhandledRejection', console.warn);
+    process.on('uncaughtException', console.warn);
   });
 
   describe('when bad token was provided', () => {
-    it('should return 401 error', async () => {
+    beforeAll(async () => {
       response = await request
         .patch('/api/v1/users/avatar')
         .set('Authorization', 'Bearer bad_token')
         .attach('avatar', imgFile)
-        .expect(401);
+        .set('Connection', 'keep-alive');
+    });
+
+    it('should return 401 error', () => {
+      expect(response.status).toEqual(401);
     });
   });
 

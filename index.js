@@ -1,6 +1,6 @@
 const CrudServer = require('./src/server');
 
-crudServer = new CrudServer()
+new CrudServer()
   .setup()
   .then(server => server.startListening())
   .catch(console.log);

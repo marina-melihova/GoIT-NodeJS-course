@@ -40,7 +40,7 @@ async function updateUser(userId, updateParams) {
 }
 
 async function deleteUser(id) {
-  return await this.deleteOne(id);
+  return await this.deleteOne({ _id: id });
 }
 
 async function getUserByEmail(email) {

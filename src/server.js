@@ -72,8 +72,10 @@ class CrudServer {
             .map(item => item.message)
             .join(', ')}`;
         }
-        const status = 'fail';
-        return res.status(400).send({ status: status, message: err.message });
+        const statusName = 'fail';
+        return res
+          .status(400)
+          .json({ status: statusName, message: err.message });
       }
       return next(err);
     });
@@ -83,7 +85,7 @@ class CrudServer {
       const statusName = err.statusName || 'error';
       return res
         .status(status)
-        .send({ status: statusName, message: err.message });
+        .ison({ status: statusName, message: err.message });
     });
   }
 

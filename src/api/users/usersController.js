@@ -1,4 +1,3 @@
-const path = require('path');
 const Joi = require('joi');
 const UserModel = require('./usersModel');
 const { handleAvatar } = require('../../helpers/uploadAvatar');
@@ -18,9 +17,9 @@ const updateAvatar = async (req, res) => {
     await UserModel.updateAvatar(user._id, newAvatarUrl);
     user.avatarURL = newAvatarUrl;
     const { _id, email, avatarURL, subscription, token } = user;
-    return res.send({ _id, email, avatarURL, subscription, token });
+    return res.json({ _id, email, avatarURL, subscription, token });
   }
-  return res.status(400).send({ message: 'Please, send a valid image.' });
+  return res.status(400).json({ message: 'Please, send a valid image.' });
 };
 
 const updateSubscription = async (req, res) => {

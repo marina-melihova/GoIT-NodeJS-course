@@ -28,7 +28,7 @@ const signUp = async (req, res, next) => {
   await sendVerificationEmail(email, verificationToken);
 
   const { _id, subscription } = newUser;
-  return res.status(201).send({ _id, email, subscription, avatarURL });
+  return res.status(201).json({ _id, email, subscription, avatarURL });
 };
 
 const signIn = async (req, res, next) => {
@@ -62,7 +62,7 @@ const signIn = async (req, res, next) => {
 const logout = async (req, res) => {
   await UserModel.updateToken(req.user._id, null);
   req.user = null;
-  res.sendStatus(204);
+  return res.sendStatus(204);
 };
 
 const signSchema = Joi.object({
@@ -90,7 +90,7 @@ const verifyEmail = async (req, res, next) => {
   const user = await UserModel.findOneAndUpdate(
     { verificationToken },
     { $unset: { verificationToken } },
-      { new: true },
+    { new: true },
   );
   if (!user) {
     return next(new AppError('Not found', 404));
@@ -99,22 +99,3 @@ const verifyEmail = async (req, res, next) => {
 }
 
 module.exports = { signIn, signUp, logout, verifyEmail, signSchema };
-
-exports.verificationEmail = async (req, res, next) => {
-  try {
-    const query = req.params.verificationToken;
-
-    const ContactByVerificationToken = await userModel.findOneAndUpdate(
-      { verificationToken: query },
-      { verificationToken: null },
-      { new: true },
-    );
-
-    if (!ContactByVerificationToken) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    return res.status(200).send('Ok');
-  } catch (err) {
-    next(err);
-  }
-};

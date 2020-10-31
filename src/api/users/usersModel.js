@@ -64,5 +64,4 @@ async function updateAvatar(id, avatarURL) {
   });
 }
 
-// users
 module.exports = mongoose.model('User', userSchema);

@@ -12,7 +12,7 @@ const validate = (schema, reqPart = 'body') => (req, res, next) => {
   }
 
   req[reqPart] = value;
-  next();
+  return next();
 };
 
 module.exports = { validate };

@@ -22,12 +22,7 @@ const signUp = async (req, res, next) => {
   const avatarURL = `http://localhost:3000/images/${randomAvatar}`;
   const newUser = await UserModel.addUser({ email, passwordHash, avatarURL });
   const { _id, subscription } = newUser;
-  return res.status(201).send({
-    _id,
-    email,
-    subscription,
-    avatarURL,
-  });
+  return res.status(201).json({ _id, email, subscription, avatarURL });
 };
 
 const signIn = async (req, res, next) => {
@@ -61,7 +56,7 @@ const signIn = async (req, res, next) => {
 const logout = async (req, res) => {
   await UserModel.updateToken(req.user._id, null);
   req.user = null;
-  res.sendStatus(204);
+  return res.sendStatus(204);
 };
 
 const signSchema = Joi.object({

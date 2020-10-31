@@ -5,7 +5,7 @@ const ContactModel = require('./contactsModel');
 
 const createContact = async (req, res) => {
   const newContact = await ContactModel.addContact(req.body);
-  res.status(201).json(newContact);
+  return res.status(201).json(newContact);
 };
 
 const getContacts = async (req, res) => {
@@ -16,7 +16,7 @@ const getContacts = async (req, res) => {
   } else {
     contacts = await ContactModel.getContacts(sub);
   }
-  res.json(contacts);
+  return res.json(contacts);
 };
 
 const getContactById = async (req, res) => {
@@ -25,7 +25,7 @@ const getContactById = async (req, res) => {
   if (!contact) {
     return next(new AppError(`No contact found with that ID`, 404));
   }
-  res.json(contact);
+  return res.json(contact);
 };
 
 const updateContact = async (req, res) => {
@@ -37,7 +37,7 @@ const updateContact = async (req, res) => {
   if (!contact) {
     return next(new AppError(`No contact found with that ID`, 404));
   }
-  res.json(contact);
+  return res.json(contact);
 };
 
 const deleteContact = async (req, res) => {
@@ -46,7 +46,7 @@ const deleteContact = async (req, res) => {
   if (!deleteResult.deletedCount) {
     return next(new AppError(`No contact found with that ID`, 404));
   }
-  res.json({ message: 'contact deleted' });
+  return res.json({ message: 'contact deleted' });
 };
 
 const schemaId = Joi.object({

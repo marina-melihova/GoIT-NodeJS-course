@@ -85,7 +85,7 @@ class CrudServer {
       const statusName = err.statusName || 'error';
       return res
         .status(status)
-        .ison({ status: statusName, message: err.message });
+        .json({ status: statusName, message: err.message });
     });
   }
 

@@ -2,6 +2,7 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../users/usersModel');
 const Joi = require('joi');
+const uuid = require("uuid");
 const AppError = require('../../helpers/appError');
 const { generateAvatar, handleAvatar } = require('../../helpers/uploadAvatar');
 
@@ -17,17 +18,17 @@ const signUp = async (req, res, next) => {
     password,
     parseInt(process.env.SALT_ROUNDS),
   );
+
   const randomAvatar = await generateAvatar();
   await handleAvatar(randomAvatar);
   const avatarURL = `http://localhost:3000/images/${randomAvatar}`;
-  const newUser = await UserModel.addUser({ email, passwordHash, avatarURL });
+  const verificationToken = uuid.v4(),
+  const newUser = await UserModel.addUser({ email, passwordHash, verificationToken, avatarURL });
+
+  await sendVerificationEmail(email, verificationToken);
+
   const { _id, subscription } = newUser;
-  return res.status(201).send({
-    _id,
-    email,
-    subscription,
-    avatarURL,
-  });
+  return res.status(201).send({ _id, email, subscription, avatarURL });
 };
 
 const signIn = async (req, res, next) => {
@@ -69,4 +70,51 @@ const signSchema = Joi.object({
   password: Joi.string().min(8).required(),
 });
 
-module.exports = { signIn, signUp, logout, signSchema };
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const sendVerificationEmail = async (email, verificationToken) => {
+  const verificationLink = `http://localhost:3000/api/v1/auth/verify/${verificationToken}`;
+  const msg = {
+    to: email,
+    from: process.env.SENDER_EMAIL,
+    subject: 'Confirm your registration on Contacts-app',
+    text: 'Welcome to Contacts-application!',
+    html: `<a href=${verificationLink} target="_blank">Click here to verify your email</a>`,
+  };
+  await sgMail.send(msg);
+};
+
+const verifyEmail = async (req, res, next) => {
+  const { verificationToken } = req.params;
+  const user = await UserModel.findOneAndUpdate(
+    { verificationToken },
+    { $unset: { verificationToken } },
+      { new: true },
+  );
+  if (!user) {
+    return next(new AppError('Not found', 404));
+  }
+  return res.json('User successfully verified');
+}
+
+module.exports = { signIn, signUp, logout, verifyEmail, signSchema };
+
+exports.verificationEmail = async (req, res, next) => {
+  try {
+    const query = req.params.verificationToken;
+
+    const ContactByVerificationToken = await userModel.findOneAndUpdate(
+      { verificationToken: query },
+      { verificationToken: null },
+      { new: true },
+    );
+
+    if (!ContactByVerificationToken) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+    return res.status(200).send('Ok');
+  } catch (err) {
+    next(err);
+  }
+};

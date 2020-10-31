@@ -30,6 +30,7 @@
     "supertest": "^5.0.0"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.3.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -47,6 +48,7 @@
     "multer": "^1.4.2",
     "random-avatar-generator": "^2.0.0",
     "shortid": "^2.2.15",
+    "uuid": "^8.3.1",
     "yargs": "^16.0.3"
   }
 }

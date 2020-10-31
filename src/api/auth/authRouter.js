@@ -24,4 +24,9 @@ router.post(
   asyncHandler(authController.logout),
 );
 
+router.get(
+  '/verify/:verificationToken',
+  asyncHandler(authController.verifyEmail),
+);
+
 module.exports = router;

@@ -1,10 +1,13 @@
+const sgMail = require('@sendgrid/mail');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../users/usersModel');
 const Joi = require('joi');
-const uuid = require("uuid");
+const uuid = require('uuid');
 const AppError = require('../../helpers/appError');
 const { generateAvatar, handleAvatar } = require('../../helpers/uploadAvatar');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const signUp = async (req, res, next) => {
   const { email, password } = req.body;
@@ -22,8 +25,13 @@ const signUp = async (req, res, next) => {
   const randomAvatar = await generateAvatar();
   await handleAvatar(randomAvatar);
   const avatarURL = `http://localhost:3000/images/${randomAvatar}`;
-  const verificationToken = uuid.v4(),
-  const newUser = await UserModel.addUser({ email, passwordHash, verificationToken, avatarURL });
+  const verificationToken = uuid.v4();
+  const newUser = await UserModel.addUser({
+    email,
+    passwordHash,
+    verificationToken,
+    avatarURL,
+  });
 
   await sendVerificationEmail(email, verificationToken);
 
@@ -38,7 +46,9 @@ const signIn = async (req, res, next) => {
   if (!user) {
     return next(new AppError('Not authorized', 401));
   }
-
+  if (user.verificationToken) {
+    return next(new AppError('Not authorized', 401));
+  }
   const isCorrectPassword = await bcryptjs.compare(password, user.passwordHash);
   if (!isCorrectPassword) {
     return next(new AppError('Not authorized', 401));
@@ -70,9 +80,6 @@ const signSchema = Joi.object({
   password: Joi.string().min(8).required(),
 });
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
 const sendVerificationEmail = async (email, verificationToken) => {
   const verificationLink = `http://localhost:3000/api/v1/auth/verify/${verificationToken}`;
   const msg = {
@@ -96,6 +103,6 @@ const verifyEmail = async (req, res, next) => {
     return next(new AppError('Not found', 404));
   }
   return res.json('User successfully verified');
-}
+};
 
 module.exports = { signIn, signUp, logout, verifyEmail, signSchema };

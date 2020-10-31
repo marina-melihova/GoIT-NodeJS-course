@@ -86,8 +86,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
     to: email,
     from: process.env.SENDER_EMAIL,
     subject: 'Confirm your registration on Contacts-app',
-    text: 'Welcome to Contacts-application!',
-    html: `<a href=${verificationLink} target="_blank">Click here to verify your email</a>`,
+    html: `<p>Welcome to Contacts-application!</p><a href=${verificationLink} target="_blank">Click here to verify your email</a>`,
   };
   await sgMail.send(msg);
 };

@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const asyncHandler = require('express-async-handler');
-const { authorize } = require('../../helpers/authorize');
-const { validate } = require('../../helpers/validate');
+const { authorize, validate } = require('../../services');
 const authController = require('./authController');
 
 const router = Router();

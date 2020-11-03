@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const AppError = require('../../helpers/appError');
+const { AppError } = require('../../services');
 Joi.objectId = require('joi-objectid')(Joi);
 const ContactModel = require('./contactsModel');
 

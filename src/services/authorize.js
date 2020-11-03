@@ -25,4 +25,4 @@ const authorize = async (req, res, next) => {
   return next();
 };
 
-module.exports = { authorize };
+module.exports = authorize;

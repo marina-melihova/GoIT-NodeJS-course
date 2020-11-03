@@ -2,9 +2,8 @@ require('dotenv').config({ path: './.env' });
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
 const { assert } = require('chai');
-const { authorize } = require('../src/helpers/authorize');
+const { authorize, AppError } = require('../src/services');
 const UserModel = require('../src/api/users/usersModel');
-const AppError = require('../src/helpers/appError');
 
 describe('Authmiddleware test suite', () => {
   let sandbox;

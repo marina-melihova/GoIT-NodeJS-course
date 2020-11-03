@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const UserModel = require('./usersModel');
-const { handleAvatar } = require('../../helpers/uploadAvatar');
+const { uploadFile } = require('../../services');
 
 const getCurrentUser = (req, res) => {
   const { email, _id, avatarURL, subscription, token } = req.user;
@@ -11,7 +11,7 @@ const updateAvatar = async (req, res) => {
   const { user, file } = req;
   if (file.mimetype.includes('image')) {
     const avatarFilename = file.filename;
-    await handleAvatar(avatarFilename);
+    await uploadFile.handleAvatar(avatarFilename);
     const newAvatarUrl = `http://localhost:3000/images/${avatarFilename}`;
 
     await UserModel.updateAvatar(user._id, newAvatarUrl);

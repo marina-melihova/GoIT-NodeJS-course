@@ -15,4 +15,4 @@ const validate = (schema, reqPart = 'body') => (req, res, next) => {
   return next();
 };
 
-module.exports = { validate };
+module.exports = validate;
